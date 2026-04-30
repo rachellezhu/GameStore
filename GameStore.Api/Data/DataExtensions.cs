@@ -1,0 +1,49 @@
+using GameStore.Api.Models;
+using Microsoft.EntityFrameworkCore;
+
+namespace GameStore.Api.Data;
+
+public static class DataExtensions
+{
+    public static void MigrateDb(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<GameStoreContext>();
+
+        dbContext.Database.Migrate();
+    }
+
+    public static void AddGameStoreDb(this WebApplicationBuilder builder)
+    {
+        var connectionString = builder.Configuration.GetConnectionString("GameStore");
+
+        // DbContext has a Scoped service lifetime because:
+        // 1. It ensures that a new instance of DbContext is created per request
+        // 2. DB connections are limited and expensive resource
+        // 3. DbContext is not thread-safe. Scoped avoids to concurrency issues
+        // 4. Makes it easier to manage transactions and ensure data consitency
+        // 5. Reusing a DbContext instances can lead to increased memory usage
+
+        builder.Services.AddScoped<GameStoreContext>();
+        builder.Services.AddSqlite<GameStoreContext>(
+            connectionString,
+            optionsAction: options => options.UseSeeding((context, _) =>
+            {
+                if (!context.Set<Genre>().Any())
+                {
+                    context.Set<Genre>().AddRange(
+                        new Genre { Name = "Fighting" },
+                        new Genre { Name = "Action" },
+                        new Genre { Name = "RPG" },
+                        new Genre { Name = "Adventure" },
+                        new Genre { Name = "Strategy" },
+                        new Genre { Name = "Platformer" },
+                        new Genre { Name = "Racing" }
+                    );
+                }
+
+                context.SaveChanges();
+            }));
+
+    }
+}
