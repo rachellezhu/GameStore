@@ -4,26 +4,26 @@ GET http://localhost:5127
 GET http://localhost:5127/games
 
 ###
-GET http://localhost:5127/games/3
+GET http://localhost:5127/games/2
 
 ###
 POST http://localhost:5127/games
 Content-Type: application/json
 
 {
-    "name": "Cyberpunk 2077",
-    "genreId": 3,
-    "price": 59.99,
-    "releaseDate": "2020-12-10"
+    "name": "EA Football 2026",
+    "genreId": 5,
+    "price": 29.9,
+    "releaseDate": "2025-08-21"
 }
 
 ###
-PUT http://localhost:5127/games/3
+PUT http://localhost:5127/games/2
 Content-Type: application/json
 
 {
     "name": "Astroboy II",
-    "genre": "RPG",
+    "genreId": 3,
     "price": 49.9,
     "releaseDate": "2025-06-01"
 }
