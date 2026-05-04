@@ -9,6 +9,7 @@
   <ItemGroup>
     <Folder Include="Data/" />
     <Folder Include="Dtos/" />
+    <Folder Include="Dtos/GenreDto/" />
     <Folder Include="Endpoints/" />
     <Folder Include="Models/" />
   </ItemGroup>

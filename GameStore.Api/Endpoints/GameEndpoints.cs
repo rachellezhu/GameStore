@@ -1,5 +1,5 @@
 using GameStore.Api.Data;
-using GameStore.Api.Dtos;
+using GameStore.Api.Dtos.GameDto;
 using GameStore.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,35 +9,9 @@ public static class GameEndpoints
 {
     const string GetGameByIdRouteName = "GetGameById";
 
-    private static readonly List<GameSummaryDto> games = [
-        new (
-            1,
-            "Street Fighter",
-            "Fighting",
-            19.99M,
-            new DateOnly(1992, 7, 15)
-        ),
-        new (
-            2,
-            "Final Fantasy VII Rebirth",
-            "RPG",
-            69.99M,
-            new DateOnly(2024, 2, 29)
-        ),
-
-        new (
-            3,
-            "Astroboy",
-            "Platformer",
-            59.99M,
-            new DateOnly(2024, 9, 6)
-        ),
-    ];
-
     public static void MapGamesEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/games");
-
 
         group.MapGet("/", async (GameStoreContext dbContext) => await dbContext.Games.Include(game => game.Genre).Select(game => new GameSummaryDto(
             game.Id,
@@ -110,8 +84,6 @@ public static class GameEndpoints
         group.MapDelete("/{id}", async (int id, GameStoreContext dbContext) =>
         {
             await dbContext.Games.Where(game => game.Id == id).ExecuteDeleteAsync();
-
-
 
             return Results.NoContent();
         });
