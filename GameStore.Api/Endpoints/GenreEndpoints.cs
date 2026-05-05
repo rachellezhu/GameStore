@@ -13,7 +13,7 @@ public static class GenreEndpoints
     {
         var group = app.MapGroup("/genres");
 
-        group.MapGet("/", async (GameStoreContext dbContext) => await dbContext.Genres.AsNoTracking().ToListAsync());
+        group.MapGet("/", async (GameStoreContext dbContext) => await dbContext.Genres.Select(genre => new GenreDetailsDto(genre.Id, genre.Name)).AsNoTracking().ToListAsync());
 
         group.MapGet("/{id}", async (int id, GameStoreContext dbContext) =>
         {
@@ -24,6 +24,13 @@ public static class GenreEndpoints
 
         group.MapPost("/", async (CreateGenreDto newGenre, GameStoreContext dbContext) =>
         {
+            var duplicateGenre = await dbContext.Genres.Where(genre => genre.Name == newGenre.Name).CountAsync();
+
+            if (duplicateGenre > 0)
+            {
+                return Results.Conflict();
+            }
+
             Genre genre = new()
             {
                 Name = newGenre.Name
@@ -42,6 +49,13 @@ public static class GenreEndpoints
 
         group.MapPut("/{id}", async (int id, UpdateGenreDto updatedGenre, GameStoreContext dbContext) =>
         {
+            var duplicateGenre = await dbContext.Genres.Where(genre => genre.Name == updatedGenre.Name).CountAsync();
+
+            if (duplicateGenre > 0)
+            {
+                return Results.Conflict();
+            }
+
             var existingGenre = await dbContext.Genres.FindAsync(id);
 
             if (existingGenre is null)
